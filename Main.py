@@ -1,18 +1,21 @@
 import pandas as pd
 import xml.etree.ElementTree as et
 
-# xml_file = open("./resources/import.xml","w+")
+def parse_xml(xml_file, df_cols):
+    xtree = et.parse(xml_file)
+    xroot = xtree.getroot()
+    rows = []
+    for node in xroot:
+        res = []
+        res.append(node.attrib.get(df_cols[0]))
+        for el in df_cols [1:]:
+            if node is not None and node.find(el) is not None:
+                res.append(node.find(el).text)
+            else:
+                res.append(None)
+        rows.append({df_cols[i]: res[i] for i, _ in enumerate(df_cols)})
+    out_df = pd.DataFrame(rows, columns=df_cols)
 
-xtree = et.parse("./resources/import.xml")
+    return out_df
 
-xroot = xtree.getroot()
-
-
-for node in xroot:
-    s_name = node.attrib.get("name")
-    s_mail = node.find("email").text
-    s_grade = node.find("grade").text
-    s_age = node.find("age").text
-
-print (s_mail)
-
+print (parse_xml("./resources/import.xml", ["name", "email", "grade", "age"]))
